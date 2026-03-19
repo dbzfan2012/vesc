@@ -135,19 +135,15 @@ void VescDriver::timerCallback()
    *  OPERATING - receiving commands from subscriber topics
    */
   if (driver_mode_ == MODE_INITIALIZING) {
-    // request version number, return packet will update the internal version numbers
-    vesc_.requestFWVersion();
-    if (fw_version_major_ >= 0 && fw_version_minor_ >= 0) {
-      RCLCPP_INFO(
-        get_logger(), "Connected to VESC with firmware version %d.%d",
-        fw_version_major_, fw_version_minor_);
-      driver_mode_ = MODE_OPERATING;
-    }
+    // FW 2.x sends short version packets that the parser can't handle safely.
+    // Skip version check and go straight to operating.
+    RCLCPP_INFO(get_logger(), "Connected to VESC (skipping FW version check for FW 2.x)");
+    driver_mode_ = MODE_OPERATING;
   } else if (driver_mode_ == MODE_OPERATING) {
     // poll for vesc state (telemetry)
     vesc_.requestState();
-    // poll for vesc imu
-    vesc_.requestImuData();
+    // IMU not supported on FW 2.x, do not request
+    // vesc_.requestImuData();
   } else {
     // unknown mode, how did that happen?
     assert(false && "unknown driver mode");
