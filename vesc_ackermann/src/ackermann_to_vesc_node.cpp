@@ -1,16 +1,12 @@
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "vesc_ackermann/ackermann_to_vesc.h"
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "ackermann_to_vesc_node");
-  ros::NodeHandle nh;
-  ros::NodeHandle private_nh("~");
-
-  vesc_ackermann::AckermannToVesc ackermann_to_vesc(nh, private_nh);
-
-  ros::spin();
-
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<vesc_ackermann::AckermannToVesc>();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
   return 0;
 }

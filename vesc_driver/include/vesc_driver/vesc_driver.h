@@ -5,8 +5,9 @@
 
 #include <string>
 
-#include <ros/ros.h>
-#include <std_msgs/Float64.h>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/float64.hpp>
+#include <vesc_msgs/msg/vesc_state_stamped.hpp>
 #include <boost/optional.hpp>
 
 #include "vesc_driver/vesc_interface.h"
@@ -15,12 +16,11 @@
 namespace vesc_driver
 {
 
-class VescDriver
+class VescDriver : public rclcpp::Node
 {
 public:
 
-  VescDriver(ros::NodeHandle nh,
-             ros::NodeHandle private_nh);
+  VescDriver(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
 private:
   // interface to the VESC
@@ -31,13 +31,14 @@ private:
   // limits on VESC commands
   struct CommandLimit
   {
-    CommandLimit(const ros::NodeHandle& nh, const std::string& str,
+    CommandLimit(rclcpp::Node* node, const std::string& str,
                  const boost::optional<double>& min_lower = boost::optional<double>(),
                  const boost::optional<double>& max_upper = boost::optional<double>());
     double clip(double value);
     std::string name;
     boost::optional<double> lower;
     boost::optional<double> upper;
+    rclcpp::Logger logger_;
   };
   CommandLimit duty_cycle_limit_;
   CommandLimit current_limit_;
@@ -47,15 +48,15 @@ private:
   CommandLimit servo_limit_;
 
   // ROS services
-  ros::Publisher state_pub_;
-  ros::Publisher servo_sensor_pub_;
-  ros::Subscriber duty_cycle_sub_;
-  ros::Subscriber current_sub_;
-  ros::Subscriber brake_sub_;
-  ros::Subscriber speed_sub_;
-  ros::Subscriber position_sub_;
-  ros::Subscriber servo_sub_;
-  ros::Timer timer_;
+  rclcpp::Publisher<vesc_msgs::msg::VescStateStamped>::SharedPtr state_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr servo_sensor_pub_;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr duty_cycle_sub_;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr current_sub_;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr brake_sub_;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr speed_sub_;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr position_sub_;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr servo_sub_;
+  rclcpp::TimerBase::SharedPtr timer_;
 
   // driver modes (possible states)
   typedef enum {
@@ -69,13 +70,13 @@ private:
   int fw_version_minor_;                ///< firmware minor version reported by vesc
 
   // ROS callbacks
-  void timerCallback(const ros::TimerEvent& event);
-  void dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle);
-  void currentCallback(const std_msgs::Float64::ConstPtr& current);
-  void brakeCallback(const std_msgs::Float64::ConstPtr& brake);
-  void speedCallback(const std_msgs::Float64::ConstPtr& speed);
-  void positionCallback(const std_msgs::Float64::ConstPtr& position);
-  void servoCallback(const std_msgs::Float64::ConstPtr& servo);
+  void timerCallback();
+  void dutyCycleCallback(const std_msgs::msg::Float64::SharedPtr duty_cycle);
+  void currentCallback(const std_msgs::msg::Float64::SharedPtr current);
+  void brakeCallback(const std_msgs::msg::Float64::SharedPtr brake);
+  void speedCallback(const std_msgs::msg::Float64::SharedPtr speed);
+  void positionCallback(const std_msgs::msg::Float64::SharedPtr position);
+  void servoCallback(const std_msgs::msg::Float64::SharedPtr servo);
 };
 
 } // namespace vesc_driver

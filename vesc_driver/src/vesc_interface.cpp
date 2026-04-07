@@ -9,7 +9,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <serial/serial.h>
+#include "vesc_driver/serial_port.h"
 #include <boost/crc.hpp>
 
 #include "vesc_driver/vesc_packet_factory.h"

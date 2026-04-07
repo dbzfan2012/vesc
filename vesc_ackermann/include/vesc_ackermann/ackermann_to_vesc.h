@@ -3,17 +3,18 @@
 #ifndef VESC_ACKERMANN_ACKERMANN_TO_VESC_H_
 #define VESC_ACKERMANN_ACKERMANN_TO_VESC_H_
 
-#include <ros/ros.h>
-#include <ackermann_msgs/AckermannDriveStamped.h>
+#include <rclcpp/rclcpp.hpp>
+#include <ackermann_msgs/msg/ackermann_drive_stamped.hpp>
+#include <std_msgs/msg/float64.hpp>
 
 namespace vesc_ackermann
 {
 
-class AckermannToVesc
+class AckermannToVesc : public rclcpp::Node
 {
 public:
 
-  AckermannToVesc(ros::NodeHandle nh, ros::NodeHandle private_nh);
+  AckermannToVesc(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
 private:
   // ROS parameters
@@ -24,12 +25,12 @@ private:
   /** @todo consider also providing an interpolated look-up table conversion */
 
   // ROS services
-  ros::Publisher erpm_pub_;
-  ros::Publisher servo_pub_;
-  ros::Subscriber ackermann_sub_;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr erpm_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr servo_pub_;
+  rclcpp::Subscription<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr ackermann_sub_;
 
   // ROS callbacks
-  void ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& cmd);
+  void ackermannCmdCallback(const ackermann_msgs::msg::AckermannDriveStamped::SharedPtr cmd);
 };
 
 } // namespace vesc_ackermann

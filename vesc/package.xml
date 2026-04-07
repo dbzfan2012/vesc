@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>vesc</name>
   <version>0.0.1</version>
   <description>
@@ -9,15 +10,14 @@
   <maintainer email="rockettm@cs.washington.edu">Matthew Rockett</maintainer>
   <license>BSD</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <run_depend>vesc_ackermann</run_depend>
-  <run_depend>vesc_driver</run_depend>
-  <run_depend>vesc_main</run_depend>
-  <run_depend>vesc_msgs</run_depend>
+  <exec_depend>vesc_ackermann</exec_depend>
+  <exec_depend>vesc_driver</exec_depend>
+  <exec_depend>vesc_main</exec_depend>
+  <exec_depend>vesc_msgs</exec_depend>
 
   <export>
-    <metapackage/>
+    <build_type>ament_cmake</build_type>
   </export>
-
 </package>

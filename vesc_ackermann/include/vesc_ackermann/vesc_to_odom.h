@@ -3,20 +3,20 @@
 #ifndef VESC_ACKERMANN_VESC_TO_ODOM_H_
 #define VESC_ACKERMANN_VESC_TO_ODOM_H_
 
-#include <ros/ros.h>
-#include <vesc_msgs/VescStateStamped.h>
-#include <std_msgs/Float64.h>
-#include <boost/shared_ptr.hpp>
-#include <tf/transform_broadcaster.h>
+#include <rclcpp/rclcpp.hpp>
+#include <vesc_msgs/msg/vesc_state_stamped.hpp>
+#include <std_msgs/msg/float64.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <tf2_ros/transform_broadcaster.h>
 
 namespace vesc_ackermann
 {
 
-class VescToOdom
+class VescToOdom : public rclcpp::Node
 {
 public:
 
-  VescToOdom(ros::NodeHandle nh, ros::NodeHandle private_nh);
+  VescToOdom(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
 private:
   // ROS parameters
@@ -32,18 +32,18 @@ private:
 
   // odometry state
   double x_, y_, yaw_;
-  std_msgs::Float64::ConstPtr last_servo_cmd_; ///< Last servo position commanded value
-  vesc_msgs::VescStateStamped::ConstPtr last_state_; ///< Last received state message
+  std_msgs::msg::Float64::SharedPtr last_servo_cmd_; ///< Last servo position commanded value
+  vesc_msgs::msg::VescStateStamped::SharedPtr last_state_; ///< Last received state message
 
   // ROS services
-  ros::Publisher odom_pub_;
-  ros::Subscriber vesc_state_sub_;
-  ros::Subscriber servo_sub_;
-  boost::shared_ptr<tf::TransformBroadcaster> tf_pub_;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
+  rclcpp::Subscription<vesc_msgs::msg::VescStateStamped>::SharedPtr vesc_state_sub_;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr servo_sub_;
+  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_pub_;
 
   // ROS callbacks
-  void vescStateCallback(const vesc_msgs::VescStateStamped::ConstPtr& state);
-  void servoCmdCallback(const std_msgs::Float64::ConstPtr& servo);
+  void vescStateCallback(const vesc_msgs::msg::VescStateStamped::SharedPtr state);
+  void servoCmdCallback(const std_msgs::msg::Float64::SharedPtr servo);
 };
 
 } // namespace vesc_ackermann

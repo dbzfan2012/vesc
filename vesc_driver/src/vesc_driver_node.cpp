@@ -1,16 +1,12 @@
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "vesc_driver/vesc_driver.h"
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "vesc_driver_node");
-  ros::NodeHandle nh;
-  ros::NodeHandle private_nh("~");
-
-  vesc_driver::VescDriver vesc_driver(nh, private_nh);
-
-  ros::spin();
-
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<vesc_driver::VescDriver>();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
   return 0;
 }
